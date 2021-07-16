@@ -7,7 +7,7 @@ data:
           module: flame.core.data.voc_dataset
           class: VOCDataset
           VOCDataset:
-            input_dir: '''dataset/VOC2007/test'''
+            input_dir: '''../efficient_det_pytorch/dataset/VOC2007/test'''
             image_size: 300
             classes:
               aeroplane: 0
