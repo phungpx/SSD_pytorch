@@ -40,17 +40,17 @@ class Trainer(Engine):
     def init(self):
         assert 'model' in self.frame, 'The frame does not have model.'
         assert 'optim' in self.frame, 'The frame does not have optim.'
-        assert 'loss' in self.frame, 'The frame does not have loss.'
         self.model = self.frame['model'].to(self.device)
         self.optimizer = self.frame['optim']
-        self.loss = self.frame['loss']
 
     def _update(self, engine, batch):
         self.model.train()
         self.optimizer.zero_grad()
         params = [param.to(self.device) if torch.is_tensor(param) else param for param in batch]
-        params[0] = self.model(params[0])
-        loss = self.loss(*params)
+        samples = list(sample.to(self.device) for sample in params[0])
+        targets = [{k: v.to(self.device) for k, v in sample.items()} for sample in params[1]]
+        losses = self.model(samples, targets)
+        loss = sum(loss for loss in losses.values())
         loss.backward()
         self.optimizer.step()
         return loss.item()
@@ -70,5 +70,7 @@ class Evaluator(Engine):
         self.model.eval()
         with torch.no_grad():
             params = [param.to(self.device) if torch.is_tensor(param) else param for param in batch]
-            params[0] = self.model(params[0])
+            samples = list(sample.to(self.device) for sample in params[0])
+            targets = [{k: v.to(self.device) for k, v in sample.items()} for sample in params[1]]
+            params[0], params[1] = self.model(samples), targets
             return params
