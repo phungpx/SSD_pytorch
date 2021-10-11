@@ -162,15 +162,6 @@ optim:
     momentum: 0.9
     weight_decay: 0.0005
 
-# optim:
-#   module: torch.optim
-#   class: SGD
-#   SGD:
-#     params: config['model'].parameters()
-#     lr: 0.08
-#     momentum: 0.9
-#     nesterov: True
-
 train_evaluator:
   module: flame.handlers.metric_evaluator
   class: MetricEvaluator
