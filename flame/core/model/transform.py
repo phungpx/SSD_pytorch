@@ -22,9 +22,13 @@ def _fake_cast_onnx(v):
     return v
 
 
-def _resize_image_and_masks(image: Tensor, self_min_size: float, self_max_size: float,
-                            target: Optional[Dict[str, Tensor]],
-                            fixed_size: Optional[Tuple[int, int]]) -> Tuple[Tensor, Optional[Dict[str, Tensor]]]:
+def _resize_image_and_masks(
+    image: Tensor,
+    self_min_size: float,
+    self_max_size: float,
+    target: Optional[Dict[str, Tensor]],
+    fixed_size: Optional[Tuple[int, int]]
+) -> Tuple[Tensor, Optional[Dict[str, Tensor]]]:
     if torchvision._is_tracing():
         im_shape = _get_shape_onnx(image)
     else:
@@ -46,17 +50,28 @@ def _resize_image_and_masks(image: Tensor, self_min_size: float, self_max_size: 
             scale_factor = scale.item()
         recompute_scale_factor = True
 
-    image = torch.nn.functional.interpolate(image[None], size=size, scale_factor=scale_factor, mode='bilinear',
-                                            recompute_scale_factor=recompute_scale_factor, align_corners=False)[0]
+    image = torch.nn.functional.interpolate(
+        image[None],
+        size=size,
+        scale_factor=scale_factor,
+        mode='bilinear',
+        recompute_scale_factor=recompute_scale_factor,
+        align_corners=False
+    )[0]
 
     if target is None:
         return image, target
 
     if "masks" in target:
         mask = target["masks"]
-        mask = torch.nn.functional.interpolate(mask[:, None].float(), size=size, scale_factor=scale_factor,
-                                               recompute_scale_factor=recompute_scale_factor)[:, 0].byte()
+        mask = torch.nn.functional.interpolate(
+            mask[:, None].float(),
+            size=size,
+            scale_factor=scale_factor,
+            recompute_scale_factor=recompute_scale_factor
+        )[:, 0].byte()
         target["masks"] = mask
+
     return image, target
 
 
