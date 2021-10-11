@@ -129,8 +129,10 @@ class SSDMatcher(Matcher):
 
         # For each gt, find the prediction with which it has the highest quality
         _, highest_quality_pred_foreach_gt = match_quality_matrix.max(dim=1)
-        matches[highest_quality_pred_foreach_gt] = torch.arange(highest_quality_pred_foreach_gt.size(0),
-                                                                dtype=torch.int64,
-                                                                device=highest_quality_pred_foreach_gt.device)
+        matches[highest_quality_pred_foreach_gt] = torch.arange(
+            highest_quality_pred_foreach_gt.size(0),
+            dtype=torch.int64,
+            device=highest_quality_pred_foreach_gt.device
+        )
 
         return matches

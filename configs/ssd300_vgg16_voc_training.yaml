@@ -191,12 +191,36 @@ metrics:
   Metrics:
     metrics:
       mAP:
-        module: flame.handlers.metrics.mAP
-        class: mAP
-        mAP:
-          num_classes: 21
-          iou_threshold: 0.5
-          box_format: '''corners'''
+        module: flame.handlers.metrics.mean_average_precision.evaluator
+        class: Evaluator
+        Evaluator:
+          eval_fn:
+            module: flame.handlers.metrics.mean_average_precision.mAP
+            class: MeanAveragePrecision
+            MeanAveragePrecision:
+              classes:
+                aeroplane: 1
+                bicycle: 2
+                bird: 3
+                boat: 4
+                bottle: 5
+                bus: 6
+                car: 7
+                cat: 8
+                chair: 9
+                cow: 10
+                diningtable: 11
+                dog: 12
+                horse: 13
+                motorbike: 14
+                person: 15
+                pottedplant: 16
+                sheep: 17
+                sofa: 18
+                train: 19
+                tvmonitor: 20
+              iou_threshold: 0.5
+              method: '''every_point_interpolation'''
           output_transform: 'lambda x: (x[0], x[1])'
     attach_to:
       train_evaluator: '''train'''
@@ -232,7 +256,7 @@ lr_scheduler:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 10
+    patience: 3
     verbose: True
 
 early_stopping:
@@ -242,13 +266,13 @@ early_stopping:
     score_name: '''mAP'''
     evaluator_name: '''valid_evaluator'''
     mode: '''max'''
-    patience: 50
+    patience: 5
 
 best_saver:
   module: flame.handlers.checkpoint
   class: BestSaver
   BestSaver:
-    dirname: '''checkpoint/VOC2007/ssd300'''
+    dirname: '''checkpoint/PASCAL/ssd300'''
     score_name: '''mAP'''
     mode: '''max'''
     evaluator_name: '''valid_evaluator'''
@@ -266,7 +290,7 @@ backup_saver:
       - '''history'''
       - '''lr_scheduler'''
       - '''early_stopping'''
-    dirname: '''checkpoint/VOC2007/ssd300'''
+    dirname: '''checkpoint/PASCAL/ssd300'''
     save_interval: 1
     n_saved: 1
 

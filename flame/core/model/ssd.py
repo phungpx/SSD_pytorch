@@ -96,22 +96,25 @@ class SSD(nn.Module):
         'proposal_matcher': Matcher,
     }
 
-    def __init__(self, backbone: nn.Module, anchor_generator: DefaultBoxGenerator,
-                 size: Tuple[int, int], num_classes: int,
-                 image_mean: Optional[List[float]] = None, image_std: Optional[List[float]] = None,
-                 head: Optional[nn.Module] = None,
-                 score_thresh: float = 0.01,
-                 nms_thresh: float = 0.45,
-                 detections_per_img: int = 200,
-                 iou_thresh: float = 0.5,
-                 topk_candidates: int = 400,
-                 positive_fraction: float = 0.25):
+    def __init__(
+        self,
+        backbone: nn.Module,
+        anchor_generator: DefaultBoxGenerator,
+        size: Tuple[int, int], num_classes: int,
+        image_mean: Optional[List[float]] = None,
+        image_std: Optional[List[float]] = None,
+        head: Optional[nn.Module] = None,
+        score_thresh: float = 0.01,
+        nms_thresh: float = 0.45,
+        detections_per_img: int = 200,
+        iou_thresh: float = 0.5,
+        topk_candidates: int = 400,
+        positive_fraction: float = 0.25
+    ) -> None:
         super().__init__()
 
         self.backbone = backbone
-
         self.anchor_generator = anchor_generator
-
         self.box_coder = BoxCoder(weights=(10., 10., 5., 5.))
 
         if head is None:
@@ -147,15 +150,23 @@ class SSD(nn.Module):
         self._has_warned = False
 
     @torch.jit.unused
-    def eager_outputs(self, losses: Dict[str, Tensor],
-                      detections: List[Dict[str, Tensor]]) -> Tuple[Dict[str, Tensor], List[Dict[str, Tensor]]]:
+    def eager_outputs(
+        self,
+        losses: Dict[str, Tensor],
+        detections: List[Dict[str, Tensor]]
+    ) -> Tuple[Dict[str, Tensor], List[Dict[str, Tensor]]]:
         if self.training:
             return losses
 
         return detections
 
-    def compute_loss(self, targets: List[Dict[str, Tensor]], head_outputs: Dict[str, Tensor], anchors: List[Tensor],
-                     matched_idxs: List[Tensor]) -> Dict[str, Tensor]:
+    def compute_loss(
+        self,
+        targets: List[Dict[str, Tensor]],
+        head_outputs: Dict[str, Tensor],
+        anchors: List[Tensor],
+        matched_idxs: List[Tensor]
+    ) -> Dict[str, Tensor]:
         bbox_regression = head_outputs['bbox_regression']
         cls_logits = head_outputs['cls_logits']
 
@@ -215,8 +226,11 @@ class SSD(nn.Module):
             'classification': (cls_loss[foreground_idxs].sum() + cls_loss[background_idxs].sum()) / N,
         }
 
-    def forward(self, images: List[Tensor],
-                targets: Optional[List[Dict[str, Tensor]]] = None) -> Tuple[Dict[str, Tensor], List[Dict[str, Tensor]]]:
+    def forward(
+        self,
+        images: List[Tensor],
+        targets: Optional[List[Dict[str, Tensor]]] = None
+    ) -> Tuple[Dict[str, Tensor], List[Dict[str, Tensor]]]:
         if self.training and targets is None:
             raise ValueError("In training mode, targets should be passed")
 
@@ -226,12 +240,15 @@ class SSD(nn.Module):
                 boxes = target["boxes"]
                 if isinstance(boxes, torch.Tensor):
                     if len(boxes.shape) != 2 or boxes.shape[-1] != 4:
-                        raise ValueError("Expected target boxes to be a tensor"
-                                         "of shape [N, 4], got {:}.".format(
-                                             boxes.shape))
+                        raise ValueError(
+                            "Expected target boxes to be a tensor"
+                            "of shape [N, 4], got {:}.".format(boxes.shape)
+                        )
                 else:
-                    raise ValueError("Expected target boxes to be of type "
-                                     "Tensor, got {:}.".format(type(boxes)))
+                    raise ValueError(
+                        "Expected target boxes to be of type "
+                        "Tensor, got {:}.".format(type(boxes))
+                    )
 
         # get the original image sizes
         original_image_sizes: List[Tuple[int, int]] = []
@@ -251,9 +268,11 @@ class SSD(nn.Module):
                 if degenerate_boxes.any():
                     bb_idx = torch.where(degenerate_boxes.any(dim=1))[0][0]
                     degen_bb: List[float] = boxes[bb_idx].tolist()
-                    raise ValueError("All bounding boxes should have positive height and width."
-                                     " Found invalid box {} for target at index {}."
-                                     .format(degen_bb, target_idx))
+                    raise ValueError(
+                        "All bounding boxes should have positive height and width."
+                        " Found invalid box {} for target at index {}."
+                        .format(degen_bb, target_idx)
+                    )
 
         # get the features from the backbone
         features = self.backbone(images.tensors)
@@ -276,8 +295,11 @@ class SSD(nn.Module):
             matched_idxs = []
             for anchors_per_image, targets_per_image in zip(anchors, targets):
                 if targets_per_image['boxes'].numel() == 0:
-                    matched_idxs.append(torch.full((anchors_per_image.size(0),), -1, dtype=torch.int64,
-                                                   device=anchors_per_image.device))
+                    matched_idxs.append(torch.full(
+                        (anchors_per_image.size(0),), -1,
+                        dtype=torch.int64,
+                        device=anchors_per_image.device)
+                    )
                     continue
 
                 match_quality_matrix = ops.box_iou(targets_per_image['boxes'], anchors_per_image)
