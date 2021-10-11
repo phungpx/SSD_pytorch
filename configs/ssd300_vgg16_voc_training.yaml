@@ -17,8 +17,8 @@ data:
             label_dir: '''../efficient_det_pytorch/dataset/PASCALVOC2007/VOCtrainval_06-Nov-2007/VOCdevkit/VOC2007/Annotations/'''
           image_extent: '''.jpg'''
           label_extent: '''.xml'''
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
+          # mean: [0.485, 0.456, 0.406]
+          # std: [0.229, 0.224, 0.225]
           classes:
             aeroplane: 1
             bicycle: 2
@@ -67,8 +67,8 @@ data:
             label_dir: '''../efficient_det_pytorch/dataset/PASCALVOC2007/VOCtrainval_06-Nov-2007/VOCdevkit/VOC2007/Annotations/'''
           image_extent: '''.jpg'''
           label_extent: '''.xml'''
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
+          # mean: [0.485, 0.456, 0.406]
+          # std: [0.229, 0.224, 0.225]
           classes:
             aeroplane: 1
             bicycle: 2
@@ -115,8 +115,8 @@ data:
             label_dir: '''../efficient_det_pytorch/dataset/PASCALVOC2007/VOCtest_06-Nov-2007/VOCdevkit/VOC2007/Annotations/'''
           image_extent: '''.jpg'''
           label_extent: '''.xml'''
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
+          # mean: [0.485, 0.456, 0.406]
+          # std: [0.229, 0.224, 0.225]
           classes:
             aeroplane: 1
             bicycle: 2
@@ -158,8 +158,8 @@ optim:
   class: SGD
   SGD:
     params: config['model'].parameters()
-    lr: 0.005
-    momentum: 0.95
+    lr: 0.001
+    momentum: 0.9
     weight_decay: 0.0005
 
 # optim:
@@ -277,6 +277,8 @@ engine:
     dataset: config['data']['train']
     device: '''cuda'''
     max_epochs: 10000
+    max_norm: None
+    norm_type: 2
 
 extralibs:
   torch: torch

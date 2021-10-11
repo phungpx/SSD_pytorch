@@ -295,8 +295,12 @@ class SSD(nn.Module):
             return losses, detections
         return self.eager_outputs(losses, detections)
 
-    def postprocess_detections(self, head_outputs: Dict[str, Tensor], image_anchors: List[Tensor],
-                               image_shapes: List[Tuple[int, int]]) -> List[Dict[str, Tensor]]:
+    def postprocess_detections(
+        self,
+        head_outputs: Dict[str, Tensor],
+        image_anchors: List[Tensor],
+        image_shapes: List[Tuple[int, int]]
+    ) -> List[Dict[str, Tensor]]:
         bbox_regression = head_outputs['bbox_regression']
         pred_scores = F.softmax(head_outputs['cls_logits'], dim=-1)
 

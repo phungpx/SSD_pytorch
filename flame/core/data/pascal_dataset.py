@@ -21,15 +21,13 @@ class PascalDataset(Dataset):
         image_extent: str = '.jpg',
         label_extent: str = '.xml',
         classes: Dict[str, int] = None,
-        mean: List[float] = [0.485, 0.456, 0.406],
-        std: List[float] = [0.229, 0.224, 0.225],
+        mean: Optional[List[float]] = None,
+        std: Optional[List[float]] = None,
         transforms: Optional[List] = None
     ):
         super(PascalDataset, self).__init__()
         self.classes = classes
         self.image_size = image_size
-        self.std = torch.tensor(std, dtype=torch.float).view(3, 1, 1)
-        self.mean = torch.tensor(mean, dtype=torch.float).view(3, 1, 1)
         self.pad_to_square = iaa.PadToSquare(position='right-bottom')
         self.transforms = transforms if transforms else []
 
@@ -57,6 +55,12 @@ class PascalDataset(Dataset):
         print(f'\t VOC2007: {len(voc2007_pairs)}')
         print(f'\t VOC2012: {len(voc2012_pairs)}')
         print(f'\t Total: {len(self.data_pairs)}')
+
+        if (std is not None) and (mean is not None):
+            std = torch.tensor(std, dtype=torch.float).view(3, 1, 1)
+            mean = torch.tensor(mean, dtype=torch.float).view(3, 1, 1)
+        self.std = std
+        self.mean = mean
 
     def __len__(self):
         return len(self.data_pairs)
@@ -149,6 +153,9 @@ class PascalDataset(Dataset):
         # Sample
         sample = torch.from_numpy(np.ascontiguousarray(image))
         sample = sample.permute(2, 0, 1).contiguous()
-        sample = (sample.float().div(255.) - self.mean) / self.std
+        sample = sample.float().div(255.)
+
+        if (self.mean is not None) and (self.std is not None):
+            sample = (sample - self.mean) / self.std
 
         return sample, target, image_info

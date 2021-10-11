@@ -36,6 +36,10 @@ class Trainer(Engine):
         Engine controls training process.
         See Engine documentation for more details about parameters.
     '''
+    def __init__(self, dataset, device, max_norm=None, norm_type=2, max_epochs=1):
+        super(Trainer, self).__init__(dataset, device, max_epochs)
+        self.max_norm = max_norm
+        self.norm_type = norm_type
 
     def init(self):
         assert 'model' in self.frame, 'The frame does not have model.'
@@ -52,6 +56,8 @@ class Trainer(Engine):
         losses = self.model(samples, targets)
         loss = sum(loss for loss in losses.values())
         loss.backward()
+        if self.max_norm is not None:
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.max_norm, self.norm_type)
         self.optimizer.step()
         return loss.item()
 

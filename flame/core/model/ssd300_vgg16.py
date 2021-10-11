@@ -35,8 +35,14 @@ def _validate_trainable_layers(pretrained, trainable_backbone_layers, max_value,
     return trainable_backbone_layers
 
 
-def ssd300_vgg16(pretrained: bool = False, progress: bool = True, num_classes: int = 91,
-                 pretrained_backbone: bool = True, trainable_backbone_layers: Optional[int] = None, **kwargs: Any):
+def ssd300_vgg16(
+    pretrained: bool = False,
+    progress: bool = True,
+    num_classes: int = 91,
+    pretrained_backbone: bool = True,
+    trainable_backbone_layers: Optional[int] = None,
+    **kwargs: Any
+):
     """Constructs an SSD model with input size 300x300 and a VGG16 backbone.
     Reference: `"SSD: Single Shot MultiBox Detector" <https://arxiv.org/abs/1512.02325>`_.
     The input to the model is expected to be a list of tensors, each of shape [C, H, W], one for each
