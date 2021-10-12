@@ -106,7 +106,7 @@ checkpoint_loader:
   module: flame.handlers.checkpoint
   class: CheckpointLoader
   CheckpointLoader:
-    checkpoint_path: ''''''
+    checkpoint_path: '''checkpoint/PASCAL/ssd300/2110111509/best_model_13_mAP=0.7341.pt'''
     mode: '''test'''
 
 predictor:
@@ -114,7 +114,7 @@ predictor:
   class: RegionPredictor
   RegionPredictor:
     evaluator_name: '''engine'''
-    output_dir: '''checkpoint/PASCAL/ssd300/'''
+    output_dir: '''checkpoint/PASCAL/ssd300/2110111509/best_model_13_mAP=0.7341/'''
     image_size: 300
     classes:
       aeroplane: [[128, 0, 0], 1]  # color, class_idx, area_threshold
@@ -137,6 +137,8 @@ predictor:
       sofa: [[0, 192, 0], 18]
       train: [[128, 192, 0], 19]
       tvmonitor: [[0, 64, 128], 20]
+    iou_threshold: 0.5
+    score_threshold: 0.2
     output_transform: 'lambda x: (x[0], x[-1])'
 
 engine:
