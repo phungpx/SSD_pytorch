@@ -6,6 +6,12 @@
 1|Pascal VOC 2007 |5,011|4,952|-|PASCAL XML|
 2|Pascal VOC 2012 |1,464|1,449|-|PASCAL XML|
 
+## Main Functions
+Dataset: ```flame/core/data/pascal_dataset.py```
+Model: ```flame/core/model```
+Evaluator: ```flame/handlers/metrics/mean_average_precision```
+Visualization: ```flame/handlers/region_predictor.py```
+
 ## Usage
 ### Training
 ```bash
